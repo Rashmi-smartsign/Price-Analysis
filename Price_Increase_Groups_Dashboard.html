@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Price increase impact by ASIN group — SmartSign Seller Central</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600&family=Barlow+Condensed:wght@500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#ffffff; --panel:#f5f7f9; --ink:#1c2530; --muted:#5b6672; --rule:#d9dee3;
+  --y26:#1f5fa8; --y25:#9aa3ad; --step:#d99a00; --stepInk:#6b4c00; --stepBg:#fff4d1;
+  --up:#2e7d4f; --down:#b3312c; --grid:#e7eaee;
+  color-scheme: light;
+  box-sizing:border-box; padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#13181e; --panel:#1b222a; --ink:#e6eaee; --muted:#9aa5b0; --rule:#2c3640;
+    --y26:#6ea8ea; --y25:#6d7782; --step:#f0b429; --stepInk:#f0b429; --stepBg:#2a2412;
+    --up:#5cbf86; --down:#ef7a72; --grid:#252e37; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#13181e; --panel:#1b222a; --ink:#e6eaee; --muted:#9aa5b0; --rule:#2c3640;
+  --y26:#6ea8ea; --y25:#6d7782; --step:#f0b429; --stepInk:#f0b429; --stepBg:#2a2412;
+  --up:#5cbf86; --down:#ef7a72; --grid:#252e37; color-scheme: dark;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Barlow",system-ui,-apple-system,"Segoe UI",Arial,sans-serif;font-size:15px;line-height:1.5}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 60px}
+h1,h2,h3{font-family:"Barlow Condensed","Arial Narrow",Arial,sans-serif;font-weight:600;letter-spacing:.01em;margin:0}
+h1{font-size:34px;line-height:1.1}
+h2{font-size:26px}
+h3{font-size:19px;font-weight:600}
+.lede{color:var(--muted);max-width:72ch;margin:8px 0 0}
+nav.cats{display:flex;flex-wrap:wrap;gap:8px;margin:26px 0 22px}
+nav.cats button{all:unset;cursor:pointer;display:flex;align-items:center;gap:10px;padding:7px 12px 7px 7px;border:1.5px solid var(--rule);border-radius:6px;background:var(--bg);color:var(--ink);font-family:"Barlow Condensed","Arial Narrow",sans-serif;font-size:17px;font-weight:500}
+nav.cats button .plate{min-width:34px;height:30px;padding:0 6px;display:grid;place-items:center;border-radius:4px;background:var(--panel);font-weight:700;font-size:16px}
+nav.cats button[aria-selected="true"]{border-color:var(--y26)}
+nav.cats button[aria-selected="true"] .plate{background:var(--y26);color:#fff}
+nav.cats button:focus-visible,.toggle button:focus-visible{outline:2px solid var(--y26);outline-offset:2px}
+.head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:12px;border-bottom:1px solid var(--rule);padding-bottom:12px}
+.head p{margin:4px 0 0;color:var(--muted)}
+.facts{display:flex;gap:28px;flex-wrap:wrap}
+.fact b{display:block;font-family:"Barlow Condensed",sans-serif;font-size:24px;font-weight:600}
+.fact span{color:var(--muted);font-size:13px}
+.steps{margin:16px 0 4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+.steps .lab{color:var(--muted);font-size:13px;margin-right:4px}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:3px 9px;border-radius:4px;background:var(--stepBg);color:var(--stepInk);font-size:13px;font-weight:500}
+.chip::before{content:"";width:3px;height:13px;background:var(--step);border-radius:1px}
+.chip.after{opacity:.7}
+.toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin:22px 0 10px}
+.toggle{display:inline-flex;border:1.5px solid var(--rule);border-radius:6px;overflow:hidden}
+.toggle button{all:unset;cursor:pointer;padding:6px 16px;font-weight:500}
+.toggle button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.legend{display:flex;gap:18px;flex-wrap:wrap;font-size:13px;color:var(--muted)}
+.legend i{display:inline-block;width:22px;height:0;border-top:3px solid var(--y26);vertical-align:middle;margin-right:6px}
+.legend i.ly{border-top:2px dashed var(--y25)}
+.legend i.st{width:0;height:14px;border:0;border-left:2px dashed var(--step);margin-right:8px}
+.charts{display:grid;grid-template-columns:1fr;gap:18px}
+.card{border-top:1px solid var(--rule);padding-top:12px}
+.card .row{display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap}
+.card .note{color:var(--muted);font-size:13px}
+.cbox{position:relative;height:260px}
+.tablewrap{overflow-x:auto;margin-top:26px;border-top:2px solid var(--ink)}
+table{border-collapse:collapse;width:100%;font-size:13.5px;font-variant-numeric:tabular-nums}
+th,td{padding:6px 9px;text-align:right;white-space:nowrap;border-bottom:1px solid var(--rule)}
+th{font-weight:600;color:var(--muted);vertical-align:bottom}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+tr.total td{font-weight:600;border-top:1.5px solid var(--ink)}
+tr.has-step td:first-child{box-shadow:inset 3px 0 0 var(--step)}
+td.up{color:var(--up)} td.down{color:var(--down)}
+.foot{color:var(--muted);font-size:13px;margin-top:10px;max-width:90ch}
+.foot p{margin:4px 0}
+@media (min-width:900px){.cbox{height:280px}}
+@media (prefers-reduced-motion: reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>Price increase impact by ASIN group</h1>
+    <p class="lede">Seller Central, 28 Jun – 10 Oct 2026, each week set against the same week of 2025. ASINs are grouped by their price-increase history: when they were increased, and whether they were increased again. Pick a group to see how sales, units and sessions moved around each price increase. Ad spend is in the tables.</p>
+  </header>
+  <nav class="cats" role="tablist" aria-label="ASIN group" id="cats"></nav>
+  <main id="view"></main>
+</div>
+<script>
+const DATA = [{"key": "A", "name": "Jul only (stopped in Jul)", "desc": "Increased only in July (01\u201329 Jul), then held.", "asins": 1903, "weeks": ["28 Jun", "05 Jul", "12 Jul", "19 Jul", "26 Jul", "02 Aug", "09 Aug", "16 Aug", "23 Aug", "30 Aug", "06 Sep", "13 Sep", "20 Sep", "27 Sep", "04 Oct"], "weekStart": ["2026-06-28", "2026-07-05", "2026-07-12", "2026-07-19", "2026-07-26", "2026-08-02", "2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27", "2026-10-04"], "w": {"Sales 2026": [106921.15, 118826.01, 117847.77, 129002.1, 124193.88, 109890.99, 114501.16, 94496.86, 77390.77, 83911.24, 78505.33, 86250.45, 102166.5, 103039.8, 102553.75], "Sales 2025": [89019.19, 110804.68, 88693.5, 86287.04, 86004.8, 94026.24, 86985.47, 85823.41, 80699.62, 79518.19, 94095.85, 90544.43, 93387.23, 91602.89, 95756.11], "Units 2026": [4315.0, 4869.0, 4638.0, 4858.0, 4755.0, 4150.0, 4153.0, 3585.0, 2907.0, 3309.0, 2962.0, 3471.0, 3902.0, 3802.0, 3996.0], "Units 2025": [4467.0, 5916.0, 4284.0, 4115.0, 4342.0, 4613.0, 4254.0, 4102.0, 3867.0, 3804.0, 4286.0, 3982.0, 4127.0, 4125.0, 4507.0], "Orders 2026": [2859.0, 3255.0, 3188.0, 3354.0, 3167.0, 2796.0, 2816.0, 2316.0, 1987.0, 2145.0, 1930.0, 2133.0, 2486.0, 2494.0, 2505.0], "Orders 2025": [3432.0, 4155.0, 3004.0, 2929.0, 3125.0, 3387.0, 2871.0, 2837.0, 2668.0, 2572.0, 2785.0, 2666.0, 2717.0, 2845.0, 3018.0], "Sessions 2026": [18689.0, 22065.0, 22000.0, 21353.0, 20265.0, 17696.0, 17059.0, 14469.0, 10881.0, 12828.0, 11160.0, 12821.0, 16453.0, 15509.0, 16429.0], "Sessions 2025": [28147.0, 29758.0, 22584.0, 23473.0, 22856.0, 25431.0, 20250.0, 19709.0, 18603.0, 18845.0, 18181.0, 17419.0, 18060.0, 18195.0, 18880.0], "SP Spend 2026": [12343.94, 25264.77, 24989.32, 26069.46, 24676.71, 20603.35, 20203.38, 15798.54, 9839.72, 14159.23, 15931.5, 17320.06, 19586.27, 18945.43, 19785.38], "SP Spend 2025": [7653.37, 17515.0, 12022.36, 11608.04, 12382.55, 13357.63, 11268.42, 9905.31, 9026.28, 10032.64, 9463.99, 9287.29, 10788.92, 11695.81, 15670.89], "Ad Sales 2026": [27490.88, 68512.43, 68270.08, 76412.74, 74706.26, 57620.34, 59029.33, 46796.72, 27795.19, 39298.9, 39115.89, 43185.74, 51734.92, 51713.99, 50148.64], "Ad Sales 2025": [21704.17, 51372.64, 35020.63, 37261.48, 36179.15, 41288.71, 38951.75, 36834.93, 31251.78, 34777.45, 40689.59, 37310.93, 40889.12, 40825.07, 47779.56], "Ad Clicks 2026": [5188.0, 10133.0, 10245.0, 10516.0, 9610.0, 7530.0, 7804.0, 5420.0, 3431.0, 5212.0, 5582.0, 5981.0, 7614.0, 7457.0, 7780.0], "Ad Clicks 2025": [5223.0, 11196.0, 8130.0, 8043.0, 8516.0, 8557.0, 7136.0, 6678.0, 6017.0, 6506.0, 5836.0, 5673.0, 6308.0, 6521.0, 7700.0]}, "months": ["Jun", "Jul", "Aug", "Sep", "Oct 1-10"], "m": {"Sales 2026": [570876.43, 541219.19, 416914.4, 394455.05, 148208.55], "Units 2026": [22860.0, 21226.0, 15645.0, 15215.0, 5652.0], "Orders 2026": [15219.0, 14320.0, 10502.0, 9715.0, 3612.0], "Sessions 2026": [103866.0, 102317.0, 68330.0, 64719.0, 23338.0], "SP Spend 2026": [109449.62, 112627.94, 68482.03, 77172.18, 27234.91], "Ad Sales 2026": [301530.17, 313190.06, 195447.91, 203413.56, 69780.52], "Sales 2025": [472979.24, 411356.1, 372285.71, 387569.01, null], "Units 2025": [null, 20605.0, 18092.0, null, null], "Orders 2025": [15838.0, 14699.0, 12741.0, 11460.0, null], "Sessions 2025": [133317.0, 118734.0, 99136.0, 83470.0, null], "SP Spend 2025": [74639.97, 58667.18, 46540.3, 42873.57, 23334.86], "Ad Sales 2025": [216491.83, 173961.03, 157188.96, 164635.61, 75267.09]}, "steps": [{"date": "2026-07-01", "label": "01 Jul", "n": 1903}, {"date": "2026-07-08", "label": "08 Jul", "n": 1812}, {"date": "2026-07-15", "label": "15 Jul", "n": 1444}, {"date": "2026-07-22", "label": "22 Jul", "n": 947}, {"date": "2026-07-29", "label": "29 Jul", "n": 291}]}, {"key": "B", "name": "Jul\u2013Aug, not increased again", "desc": "Ran the full Jul\u2013Aug ramp (01 Jul\u201312 Aug), then held.", "asins": 3995, "weeks": ["28 Jun", "05 Jul", "12 Jul", "19 Jul", "26 Jul", "02 Aug", "09 Aug", "16 Aug", "23 Aug", "30 Aug", "06 Sep", "13 Sep", "20 Sep", "27 Sep", "04 Oct"], "weekStart": ["2026-06-28", "2026-07-05", "2026-07-12", "2026-07-19", "2026-07-26", "2026-08-02", "2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27", "2026-10-04"], "w": {"Sales 2026": [174446.36, 205123.04, 228441.99, 204858.17, 213834.57, 195333.03, 189790.28, 172883.05, 137731.59, 165988.3, 133259.5, 158428.08, 170446.94, 175471.71, 175884.09], "Sales 2025": [143348.48, 201459.96, 178807.47, 174179.25, 169135.27, 182499.09, 168513.83, 173701.36, 162547.8, 159997.01, 171072.49, 180958.0, 184612.33, 185180.14, 191009.32], "Units 2026": [7636.0, 9111.0, 10071.0, 8697.0, 9031.0, 8323.0, 7931.0, 7339.0, 5777.0, 7008.0, 5571.0, 6461.0, 7046.0, 7301.0, 7483.0], "Units 2025": [6825.0, 10757.0, 8304.0, 7981.0, 7684.0, 8137.0, 7701.0, 7965.0, 7363.0, 7216.0, 7876.0, 8382.0, 8754.0, 8650.0, 8847.0], "Orders 2026": [4447.0, 5228.0, 5281.0, 4852.0, 5017.0, 4490.0, 4387.0, 3857.0, 3225.0, 3562.0, 3041.0, 3440.0, 3943.0, 3911.0, 4101.0], "Orders 2025": [4256.0, 6360.0, 4880.0, 4465.0, 4352.0, 4653.0, 4467.0, 4592.0, 4197.0, 4246.0, 4459.0, 4644.0, 4739.0, 4861.0, 4787.0], "Sessions 2026": [21414.0, 24590.0, 24647.0, 22475.0, 22027.0, 20060.0, 19143.0, 15877.0, 13369.0, 15506.0, 12650.0, 14058.0, 17509.0, 16168.0, 17445.0], "Sessions 2025": [26489.0, 33686.0, 27952.0, 25453.0, 22526.0, 25017.0, 24513.0, 26212.0, 23324.0, 21982.0, 22134.0, 23108.0, 28808.0, 24342.0, 24278.0], "SP Spend 2026": [17501.56, 35044.9, 36155.29, 35084.97, 35314.53, 30389.72, 29464.11, 22525.4, 13712.63, 19495.66, 19485.38, 23122.96, 29084.36, 26410.7, 28420.27], "SP Spend 2025": [11212.26, 26988.86, 18728.39, 18032.77, 19195.92, 20965.15, 18429.99, 18426.48, 15244.88, 15367.28, 16501.58, 16849.48, 18065.95, 19259.38, 21263.2], "Ad Sales 2026": [47449.19, 96075.78, 110971.34, 101468.77, 111353.35, 93060.72, 94176.21, 69305.96, 42355.85, 66163.12, 64019.7, 73063.93, 86644.98, 87120.6, 84481.17], "Ad Sales 2025": [35723.35, 81547.97, 70845.52, 69310.72, 71762.94, 81990.82, 74088.73, 68918.07, 63125.14, 65281.53, 72147.34, 71671.57, 78109.78, 84668.85, 84709.79], "Ad Clicks 2026": [6334.0, 11959.0, 11957.0, 11301.0, 11049.0, 9059.0, 9140.0, 6444.0, 3967.0, 6078.0, 6119.0, 6949.0, 9010.0, 8259.0, 9101.0], "Ad Clicks 2025": [6445.0, 14278.0, 10560.0, 10072.0, 10599.0, 11772.0, 10741.0, 10918.0, 8849.0, 8803.0, 8499.0, 8897.0, 9282.0, 9031.0, 9418.0]}, "months": ["Jun", "Jul", "Aug", "Sep", "Oct 1-10"], "m": {"Sales 2026": [940709.36, 939851.39, 738035.25, 699362.65, 246754.23], "Units 2026": [41812.0, 40768.0, 31251.0, 28910.0, 10473.0], "Orders 2026": [23589.0, 22622.0, 16888.0, 15676.0, 5657.0], "Sessions 2026": [119608.0, 116294.0, 81559.0, 74456.0, 25128.0], "SP Spend 2026": [163240.53, 158373.4, 98633.11, 105857.39, 38348.54], "Ad Sales 2026": [476023.28, 465269.78, 306821.3, 339130.58, 116489.01], "Sales 2025": [779625.29, 790159.2, 730234.21, 759206.28, null], "Units 2025": [null, 37802.0, 33237.0, null, null], "Orders 2025": [22083.0, 22061.0, 19158.0, 19572.0, null], "Sessions 2025": [147625.0, 135881.0, 119967.0, 114481.0, null], "SP Spend 2025": [98503.12, 89819.87, 78184.01, 73426.6, 32717.69], "Ad Sales 2025": [310306.54, 314126.93, 306376.44, 318808.33, 133131.19]}, "steps": [{"date": "2026-07-01", "label": "01 Jul", "n": 3995}, {"date": "2026-07-08", "label": "08 Jul", "n": 3995}, {"date": "2026-07-15", "label": "15 Jul", "n": 3995}, {"date": "2026-07-22", "label": "22 Jul", "n": 3995}, {"date": "2026-07-29", "label": "29 Jul", "n": 3995}, {"date": "2026-08-05", "label": "05 Aug", "n": 3995}, {"date": "2026-08-12", "label": "12 Aug", "n": 3619}]}, {"key": "C", "name": "Jul\u2013Aug + increased again Sep\u2013Oct", "desc": "Ran the Jul\u2013Aug ramp and were increased again from 16 Sep.", "asins": 1790, "weeks": ["28 Jun", "05 Jul", "12 Jul", "19 Jul", "26 Jul", "02 Aug", "09 Aug", "16 Aug", "23 Aug", "30 Aug", "06 Sep", "13 Sep", "20 Sep", "27 Sep", "04 Oct"], "weekStart": ["2026-06-28", "2026-07-05", "2026-07-12", "2026-07-19", "2026-07-26", "2026-08-02", "2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27", "2026-10-04"], "w": {"Sales 2026": [107998.12, 113729.78, 124724.42, 130516.51, 133771.08, 129434.0, 131739.93, 117036.56, 96060.45, 117894.35, 102733.34, 116161.25, 128382.96, 128294.65, 122650.65], "Sales 2025": [88608.04, 119730.36, 104192.34, 95281.6, 94944.41, 96052.1, 103549.14, 99584.04, 99700.56, 104333.54, 115091.09, 104026.58, 108812.12, 126424.87, 127449.24], "Units 2026": [4928.0, 5305.0, 5715.0, 5791.0, 5853.0, 5495.0, 5666.0, 4845.0, 4072.0, 4942.0, 4154.0, 4898.0, 5475.0, 5106.0, 5167.0], "Units 2025": [4593.0, 6732.0, 4944.0, 4717.0, 4725.0, 4683.0, 4919.0, 4927.0, 5046.0, 4833.0, 5362.0, 5188.0, 5510.0, 6048.0, 6096.0], "Orders 2026": [2977.0, 3166.0, 3280.0, 3375.0, 3399.0, 3090.0, 3110.0, 2732.0, 2266.0, 2631.0, 2364.0, 2646.0, 2940.0, 2917.0, 2874.0], "Orders 2025": [2816.0, 4132.0, 3083.0, 2936.0, 2859.0, 2911.0, 2959.0, 2905.0, 2802.0, 2784.0, 2975.0, 3184.0, 3168.0, 3425.0, 3448.0], "Sessions 2026": [14111.0, 15185.0, 15773.0, 15398.0, 15206.0, 14134.0, 13905.0, 12255.0, 9509.0, 11465.0, 9704.0, 10947.0, 13717.0, 13282.0, 13743.0], "Sessions 2025": [17172.0, 23079.0, 18734.0, 17205.0, 16605.0, 17458.0, 15975.0, 16069.0, 15463.0, 15279.0, 15550.0, 15529.0, 16153.0, 17040.0, 19436.0], "SP Spend 2026": [10304.33, 19730.65, 21233.96, 21642.52, 21319.62, 19628.96, 18905.27, 14800.86, 9003.39, 14017.36, 13716.57, 16179.02, 19676.6, 19036.37, 19852.4], "SP Spend 2025": [7469.81, 18139.29, 12957.82, 12174.29, 12043.88, 13073.81, 10607.3, 10196.73, 9469.96, 10170.01, 9824.52, 10436.32, 10878.47, 12081.66, 15033.96], "Ad Sales 2026": [34237.9, 52637.04, 56623.76, 64684.37, 61041.77, 61033.16, 58658.87, 45439.09, 25217.8, 43932.39, 45455.08, 47433.33, 62576.42, 68385.74, 57727.87], "Ad Sales 2025": [21044.55, 51160.91, 42656.15, 37691.74, 41394.7, 43154.68, 38675.33, 41614.77, 37216.33, 47829.62, 43776.9, 40996.13, 44221.92, 53726.15, 58419.58], "Ad Clicks 2026": [4230.0, 7837.0, 8373.0, 8472.0, 8111.0, 6820.0, 6899.0, 4973.0, 3140.0, 4993.0, 4967.0, 5519.0, 7077.0, 7013.0, 7448.0], "Ad Clicks 2025": [5164.0, 11543.0, 8745.0, 8186.0, 8423.0, 8872.0, 7114.0, 6945.0, 6500.0, 6757.0, 6229.0, 6252.0, 6573.0, 6908.0, 7795.0]}, "months": ["Jun", "Jul", "Aug", "Sep", "Oct 1-10"], "m": {"Sales 2026": [546374.11, 559202.42, 503172.24, 518791.13, 172324.11], "Units 2026": [26313.0, 25019.0, 21259.0, 21503.0, 7300.0], "Orders 2026": [15477.0, 14587.0, 11861.0, 11796.0, 4092.0], "Sessions 2026": [76764.0, 75293.0, 57866.0, 57217.0, 19954.0], "SP Spend 2026": [96506.9, 93638.36, 64220.23, 73970.96, 27218.33], "Ad Sales 2026": [268535.58, 268463.99, 194226.34, 239329.2, 83065.06], "Sales 2025": [452870.38, 454987.85, 422861.62, 476136.35, null], "Units 2025": [null, 23157.0, 20897.0, null, null], "Orders 2025": [14390.0, 14296.0, 12452.0, 13173.0, null], "Sessions 2025": [92798.0, 91389.0, 77472.0, 73349.0, null], "SP Spend 2025": [63549.91, 60213.72, 46441.92, 45205.34, 22388.69], "Ad Sales 2025": [178418.16, 185318.29, 170416.6, 198220.07, 88279.94]}, "steps": [{"date": "2026-07-01", "label": "01 Jul", "n": 1790}, {"date": "2026-07-08", "label": "08 Jul", "n": 1722}, {"date": "2026-07-15", "label": "15 Jul", "n": 1704}, {"date": "2026-07-22", "label": "22 Jul", "n": 1672}, {"date": "2026-07-29", "label": "29 Jul", "n": 1637}, {"date": "2026-08-05", "label": "05 Aug", "n": 1605}, {"date": "2026-08-12", "label": "12 Aug", "n": 1529}, {"date": "2026-09-16", "label": "16 Sep", "n": 1785}, {"date": "2026-09-23", "label": "23 Sep", "n": 1724}, {"date": "2026-09-30", "label": "30 Sep", "n": 1664}, {"date": "2026-10-07", "label": "07 Oct", "n": 1568}, {"date": "2026-10-14", "label": "14 Oct", "n": 1328}]}, {"key": "D", "name": "New in Sep\u2013Oct cycle", "desc": "First increase in the Sep\u2013Oct cycle, from 16 Sep.", "asins": 1811, "weeks": ["28 Jun", "05 Jul", "12 Jul", "19 Jul", "26 Jul", "02 Aug", "09 Aug", "16 Aug", "23 Aug", "30 Aug", "06 Sep", "13 Sep", "20 Sep", "27 Sep", "04 Oct"], "weekStart": ["2026-06-28", "2026-07-05", "2026-07-12", "2026-07-19", "2026-07-26", "2026-08-02", "2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27", "2026-10-04"], "w": {"Sales 2026": [62794.41, 67944.57, 63508.42, 66882.94, 71577.84, 65251.27, 61556.68, 60068.18, 54679.86, 58148.79, 53444.8, 64469.71, 68832.33, 68963.33, 63938.91], "Sales 2025": [36620.69, 58887.73, 51553.63, 51329.34, 45768.65, 53171.76, 52948.84, 53397.63, 48174.14, 44066.68, 52520.7, 54008.13, 50492.34, 55608.3, 56696.76], "Units 2026": [2183.0, 2536.0, 2373.0, 2432.0, 2500.0, 2470.0, 2385.0, 2347.0, 2085.0, 2132.0, 1908.0, 2374.0, 2519.0, 2336.0, 2165.0], "Units 2025": [1693.0, 2858.0, 2048.0, 2161.0, 1780.0, 1867.0, 2021.0, 1982.0, 1769.0, 1984.0, 2108.0, 2144.0, 2080.0, 2350.0, 2226.0], "Orders 2026": [1399.0, 1599.0, 1530.0, 1523.0, 1517.0, 1587.0, 1488.0, 1367.0, 1214.0, 1330.0, 1213.0, 1476.0, 1626.0, 1481.0, 1430.0], "Orders 2025": [1115.0, 1635.0, 1295.0, 1364.0, 1090.0, 1174.0, 1204.0, 1189.0, 1112.0, 1181.0, 1254.0, 1305.0, 1211.0, 1341.0, 1365.0], "Sessions 2026": [5610.0, 7700.0, 6935.0, 6797.0, 7465.0, 7286.0, 5981.0, 5842.0, 5664.0, 6221.0, 5640.0, 6461.0, 8099.0, 7020.0, 6670.0], "Sessions 2025": [5649.0, 8047.0, 6800.0, 6627.0, 5802.0, 6053.0, 6051.0, 6894.0, 6215.0, 6024.0, 6438.0, 6358.0, 6641.0, 6332.0, 6908.0], "SP Spend 2026": [4877.69, 11794.0, 11497.35, 11325.46, 12698.81, 12224.82, 10231.53, 8947.42, 5820.78, 8034.14, 7689.17, 10214.88, 12438.72, 10584.36, 11313.79], "SP Spend 2025": [2557.82, 6536.36, 5048.95, 5231.71, 5132.23, 5312.49, 5434.11, 4936.35, 4404.14, 4658.82, 5024.59, 4601.42, 4762.59, 4908.12, 5998.59], "Ad Sales 2026": [11945.93, 34220.75, 27787.53, 31859.8, 34642.02, 26047.03, 23810.42, 20223.82, 14746.86, 22483.46, 21868.06, 27416.73, 33603.46, 30441.99, 31284.22], "Ad Sales 2025": [8237.87, 20685.8, 17577.38, 18106.34, 16008.38, 18964.29, 19144.06, 16291.13, 15983.7, 15642.04, 21454.91, 21816.43, 16787.21, 19756.92, 20452.12], "Ad Clicks 2026": [1787.0, 3752.0, 3776.0, 3792.0, 4028.0, 3590.0, 3428.0, 2799.0, 2191.0, 2612.0, 2625.0, 3182.0, 4410.0, 3775.0, 3693.0], "Ad Clicks 2025": [1615.0, 3972.0, 3127.0, 3091.0, 3015.0, 3172.0, 3133.0, 3056.0, 2799.0, 2723.0, 2732.0, 2539.0, 2749.0, 2648.0, 2996.0]}, "months": ["Jun", "Jul", "Aug", "Sep", "Oct 1-10"], "m": {"Sales 2026": [291653.26, 297648.36, 254310.26, 273266.07, 94309.96], "Units 2026": [11094.0, 10768.0, 9772.0, 10014.0, 3066.0], "Orders 2026": [6885.0, 6774.0, 5978.0, 6306.0, 2010.0], "Sessions 2026": [33953.0, 36652.0, 30657.0, 32397.0, 9579.0], "SP Spend 2026": [50867.81, 51943.92, 38212.8, 44220.98, 15315.22], "Ad Sales 2026": [143116.21, 139703.69, 87092.88, 120958.57, 44626.94], "Sales 2025": [199589.17, 224399.51, 219195.27, 217903.27, null], "Units 2025": [null, 9705.0, 8068.0, null, null], "Orders 2025": [5464.0, 5930.0, 4986.0, 5335.0, null], "Sessions 2025": [31330.0, 34164.0, 30977.0, 30739.0, null], "SP Spend 2025": [21268.93, 23506.01, 21310.09, 20470.57, 9164.15], "Ad Sales 2025": [65963.65, 76741.32, 74696.36, 82555.21, 32060.97]}, "steps": [{"date": "2026-09-16", "label": "16 Sep", "n": 1810}, {"date": "2026-09-23", "label": "23 Sep", "n": 1805}, {"date": "2026-09-30", "label": "30 Sep", "n": 1790}, {"date": "2026-10-07", "label": "07 Oct", "n": 1779}, {"date": "2026-10-14", "label": "14 Oct", "n": 368}]}, {"key": "E", "name": "Not increased (control)", "desc": "Never in a price sheet. The comparison group.", "asins": 1692, "weeks": ["28 Jun", "05 Jul", "12 Jul", "19 Jul", "26 Jul", "02 Aug", "09 Aug", "16 Aug", "23 Aug", "30 Aug", "06 Sep", "13 Sep", "20 Sep", "27 Sep", "04 Oct"], "weekStart": ["2026-06-28", "2026-07-05", "2026-07-12", "2026-07-19", "2026-07-26", "2026-08-02", "2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27", "2026-10-04"], "w": {"Sales 2026": [73197.55, 86296.47, 88924.82, 99212.87, 100629.48, 95045.62, 109970.76, 87885.15, 77613.47, 87758.43, 78539.68, 88137.25, 91861.79, 104209.84, 90394.08], "Sales 2025": [62395.42, 81014.94, 79929.4, 75784.79, 69599.3, 87027.69, 83438.33, 80293.82, 76701.81, 69068.99, 70692.4, 74983.05, 74261.36, 80936.18, 82847.35], "Units 2026": [1961.0, 2263.0, 2294.0, 2339.0, 2318.0, 2124.0, 2375.0, 2179.0, 1620.0, 1816.0, 1932.0, 2005.0, 2148.0, 2554.0, 2419.0], "Units 2025": [1545.0, 2220.0, 2116.0, 1736.0, 1748.0, 1850.0, 1855.0, 2038.0, 1841.0, 1601.0, 1825.0, 1790.0, 1846.0, 1880.0, 2062.0], "Orders 2026": [1132.0, 1248.0, 1292.0, 1384.0, 1301.0, 1238.0, 1281.0, 1153.0, 998.0, 1058.0, 1044.0, 1152.0, 1286.0, 1295.0, 1332.0], "Orders 2025": [963.0, 1264.0, 1116.0, 1032.0, 989.0, 1062.0, 1033.0, 1145.0, 974.0, 968.0, 1008.0, 972.0, 1024.0, 1025.0, 1090.0], "Sessions 2026": [8269.0, 9817.0, 9591.0, 9783.0, 9161.0, 8741.0, 8631.0, 8346.0, 6181.0, 7278.0, 6566.0, 7631.0, 9506.0, 9484.0, 10048.0], "Sessions 2025": [7591.0, 9954.0, 9277.0, 8554.0, 8221.0, 8789.0, 8845.0, 9091.0, 8321.0, 7630.0, 7220.0, 7346.0, 7797.0, 7138.0, 9307.0], "SP Spend 2026": [6576.39, 16221.97, 15104.98, 15343.65, 15225.29, 13433.6, 13793.2, 11791.26, 6817.81, 10719.22, 10737.89, 11592.0, 15392.3, 15967.54, 16584.15], "SP Spend 2025": [3951.94, 8997.94, 6019.82, 6363.61, 6715.68, 7407.99, 7341.89, 8110.65, 6672.71, 6634.11, 6238.68, 6160.24, 6958.61, 6523.62, 8404.6], "Ad Sales 2026": [23525.33, 43684.69, 42473.34, 49508.24, 40619.71, 47397.9, 50229.8, 34385.6, 21479.85, 35206.04, 31886.75, 36515.78, 53570.53, 42807.27, 42901.64], "Ad Sales 2025": [14714.81, 32532.35, 27836.58, 28013.93, 27640.93, 30347.33, 29159.9, 29494.78, 33862.41, 28654.81, 23469.57, 31829.32, 36287.26, 33257.86, 36070.04], "Ad Clicks 2026": [2573.0, 5629.0, 5548.0, 5615.0, 5276.0, 4421.0, 4601.0, 3632.0, 2193.0, 3619.0, 3627.0, 3895.0, 5247.0, 5445.0, 5809.0], "Ad Clicks 2025": [2482.0, 5209.0, 4066.0, 4051.0, 4313.0, 4751.0, 4412.0, 4900.0, 4079.0, 3835.0, 3506.0, 3541.0, 3765.0, 3532.0, 4195.0]}, "months": ["Jun", "Jul", "Aug", "Sep", "Oct 1-10"], "m": {"Sales 2026": [418229.24, null, 388136.15, 399037.79, 127770.92], "Units 2026": [null, null, 8730.0, 9165.0, 3360.0], "Orders 2026": [5920.0, null, 4930.0, 5158.0, 1803.0], "Sessions 2026": [51313.0, null, 39392.0, 40730.0, 14417.0], "SP Spend 2026": [69954.44, 68289.92, 46903.29, 57945.31, 22162.73], "Ad Sales 2026": [190714.35, 199637.07, 155330.12, 182139.69, 59085.59], "Sales 2025": [323080.76, 339491.62, 346976.14, 315052.63, null], "Units 2025": [null, 8601.0, 8029.0, null, null], "Orders 2025": [4550.0, 4875.0, 4477.0, 4310.0, null], "Sessions 2025": [46254.0, 49342.0, 46695.0, 38484.0, null], "SP Spend 2025": [32344.38, 30632.05, 31331.69, 27723.82, 12591.66], "Ad Sales 2025": [114613.01, 124275.43, 130259.93, 130244.42, 58130.63]}, "steps": []}, {"key": "A\u2013D", "name": "All increased", "desc": "Every increased ASIN: A + B + C + D.", "asins": 9499, "weeks": ["28 Jun", "05 Jul", "12 Jul", "19 Jul", "26 Jul", "02 Aug", "09 Aug", "16 Aug", "23 Aug", "30 Aug", "06 Sep", "13 Sep", "20 Sep", "27 Sep", "04 Oct"], "weekStart": ["2026-06-28", "2026-07-05", "2026-07-12", "2026-07-19", "2026-07-26", "2026-08-02", "2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27", "2026-10-04"], "w": {"Sales 2026": [452160.04, 505623.4, 534522.6, 531259.72, 543377.37, 499909.29, 497588.05, 444484.65, 365862.67, 425942.68, 367942.97, 425309.49, 469828.73, 475769.49, 465027.4], "Sales 2025": [357596.4, 490882.73, 423246.94, 407077.23, 395853.13, 425749.19, 411997.28, 412506.44, 391122.12, 387915.42, 432780.13, 429537.14, 437304.02, 458816.2, 470911.43], "Units 2026": [19062.0, 21821.0, 22797.0, 21778.0, 22139.0, 20438.0, 20135.0, 18116.0, 14841.0, 17391.0, 14595.0, 17204.0, 18942.0, 18545.0, 18811.0], "Units 2025": [17578.0, 26263.0, 19580.0, 18974.0, 18531.0, 19300.0, 18895.0, 18976.0, 18045.0, 17837.0, 19632.0, 19696.0, 20471.0, 21173.0, 21676.0], "Orders 2026": [11682.0, 13248.0, 13279.0, 13104.0, 13100.0, 11963.0, 11801.0, 10272.0, 8692.0, 9668.0, 8548.0, 9695.0, 10995.0, 10803.0, 10910.0], "Orders 2025": [11619.0, 16282.0, 12262.0, 11694.0, 11426.0, 12125.0, 11501.0, 11523.0, 10779.0, 10783.0, 11473.0, 11799.0, 11835.0, 12472.0, 12618.0], "Sessions 2026": [59824.0, 69540.0, 69355.0, 66023.0, 64963.0, 59176.0, 56088.0, 48443.0, 39423.0, 46020.0, 39154.0, 44287.0, 55778.0, 51979.0, 54287.0], "Sessions 2025": [77457.0, 94570.0, 76070.0, 72758.0, 67789.0, 73959.0, 66789.0, 68884.0, 63605.0, 62130.0, 62303.0, 62414.0, 69662.0, 65909.0, 69502.0], "SP Spend 2026": [45027.52, 91834.32, 93875.92, 94122.41, 94009.67, 82846.85, 78804.29, 62072.22, 38376.52, 55706.39, 56822.62, 66836.92, 80785.95, 74976.86, 79371.84], "SP Spend 2025": [28893.26, 69179.51, 48757.52, 47046.81, 48754.58, 52709.08, 45739.82, 43464.87, 38145.26, 40228.75, 40814.68, 41174.51, 44495.93, 47944.97, 57966.64], "Ad Sales 2026": [121123.9, 251446.0, 263652.71, 274425.68, 281743.4, 237761.25, 235674.83, 181765.59, 110115.7, 171877.87, 170458.73, 191099.73, 234559.78, 237662.32, 223641.9], "Ad Sales 2025": [86709.94, 204767.32, 166099.68, 162370.28, 165345.17, 185398.5, 170859.87, 163658.9, 147576.95, 163530.64, 178068.74, 171795.06, 180008.03, 198976.99, 211361.05], "Ad Clicks 2026": [17539.0, 33681.0, 34351.0, 34081.0, 32798.0, 26999.0, 27271.0, 19636.0, 12729.0, 18895.0, 19293.0, 21631.0, 28111.0, 26504.0, 28022.0], "Ad Clicks 2025": [18447.0, 40989.0, 30562.0, 29392.0, 30553.0, 32373.0, 28124.0, 27597.0, 24165.0, 24789.0, 23296.0, 23361.0, 24912.0, 25108.0, 27909.0]}, "months": ["Jun", "Jul", "Aug", "Sep", "Oct 1-10"], "m": {"Sales 2026": [2349613.16, 2337921.36, 1912432.15, 1885874.9, 661596.85], "Units 2026": [102079.0, 97781.0, 77927.0, 75642.0, 26491.0], "Orders 2026": [61170.0, 58303.0, 45229.0, 43493.0, 15371.0], "Sessions 2026": [334191.0, 330556.0, 238412.0, 228789.0, 77999.0], "SP Spend 2026": [420064.86, 416583.62, 269548.17, 301221.51, 108117.0], "Ad Sales 2026": [1189205.24, 1186627.52, 783588.43, 902831.91, 313961.53], "Sales 2025": [1905064.08, 1880902.66, 1744576.81, 1840814.91, null], "Units 2025": [null, 91269.0, 80294.0, null, null], "Orders 2025": [57775.0, 56986.0, 49337.0, 49540.0, null], "Sessions 2025": [405070.0, 380168.0, 327552.0, 302039.0, null], "SP Spend 2025": [257961.93, 232206.78, 192476.32, 181976.08, 87605.39], "Ad Sales 2025": [771180.18, 750147.57, 708678.36, 764219.22, 328739.19]}, "steps": [{"date": "2026-07-01", "label": "01 Jul", "n": 7688}, {"date": "2026-07-08", "label": "08 Jul", "n": 7529}, {"date": "2026-07-15", "label": "15 Jul", "n": 7143}, {"date": "2026-07-22", "label": "22 Jul", "n": 6614}, {"date": "2026-07-29", "label": "29 Jul", "n": 5923}, {"date": "2026-08-05", "label": "05 Aug", "n": 5600}, {"date": "2026-08-12", "label": "12 Aug", "n": 5148}, {"date": "2026-09-16", "label": "16 Sep", "n": 3595}, {"date": "2026-09-23", "label": "23 Sep", "n": 3529}, {"date": "2026-09-30", "label": "30 Sep", "n": 3454}, {"date": "2026-10-07", "label": "07 Oct", "n": 3347}, {"date": "2026-10-14", "label": "14 Oct", "n": 1696}]}, {"key": "A+B+E", "name": "Not increased in Sep\u2013Oct", "desc": "Everything not increased in Sep\u2013Oct: A + B + E. The comparison group for C and D.", "asins": 7590, "weeks": ["28 Jun", "05 Jul", "12 Jul", "19 Jul", "26 Jul", "02 Aug", "09 Aug", "16 Aug", "23 Aug", "30 Aug", "06 Sep", "13 Sep", "20 Sep", "27 Sep", "04 Oct"], "weekStart": ["2026-06-28", "2026-07-05", "2026-07-12", "2026-07-19", "2026-07-26", "2026-08-02", "2026-08-09", "2026-08-16", "2026-08-23", "2026-08-30", "2026-09-06", "2026-09-13", "2026-09-20", "2026-09-27", "2026-10-04"], "w": {"Sales 2026": [354565.06, 410245.52, 435214.58, 433073.14, 438657.93, 400269.64, 414262.2, 355265.06, 292735.83, 337657.97, 290304.51, 332815.78, 364475.23, 382721.35, 368831.92], "Sales 2025": [294763.09, 393279.58, 347430.37, 336251.08, 324739.37, 363553.02, 338937.63, 339818.59, 319949.23, 308584.19, 335860.74, 346485.48, 352260.92, 357719.21, 369612.78], "Units 2026": [13912.0, 16243.0, 17003.0, 15894.0, 16104.0, 14597.0, 14459.0, 13103.0, 10304.0, 12133.0, 10465.0, 11937.0, 13096.0, 13657.0, 13898.0], "Units 2025": [12837.0, 18893.0, 14704.0, 13832.0, 13774.0, 14600.0, 13810.0, 14105.0, 13071.0, 12621.0, 13987.0, 14154.0, 14727.0, 14655.0, 15416.0], "Orders 2026": [8438.0, 9731.0, 9761.0, 9590.0, 9485.0, 8524.0, 8484.0, 7326.0, 6210.0, 6765.0, 6015.0, 6725.0, 7715.0, 7700.0, 7938.0], "Orders 2025": [8651.0, 11779.0, 9000.0, 8426.0, 8466.0, 9102.0, 8371.0, 8574.0, 7839.0, 7786.0, 8252.0, 8282.0, 8480.0, 8731.0, 8895.0], "Sessions 2026": [48372.0, 56472.0, 56238.0, 53611.0, 51453.0, 46497.0, 44833.0, 38692.0, 30431.0, 35612.0, 30376.0, 34510.0, 43468.0, 41161.0, 43922.0], "Sessions 2025": [62227.0, 73398.0, 59813.0, 57480.0, 53603.0, 59237.0, 53608.0, 55012.0, 50248.0, 48457.0, 47535.0, 47873.0, 54665.0, 49675.0, 52465.0], "SP Spend 2026": [36421.89, 76531.64, 76249.59, 76498.08, 75216.53, 64426.67, 63460.69, 50115.2, 30370.16, 44374.11, 46154.77, 52035.02, 64062.93, 61323.67, 64789.8], "SP Spend 2025": [22817.57, 53501.8, 36770.57, 36004.42, 38294.15, 41730.77, 37040.3, 36442.44, 30943.87, 32034.03, 32204.25, 32297.01, 35813.48, 37478.81, 45338.69], "Ad Sales 2026": [98465.4, 208272.9, 221714.76, 227389.75, 226679.32, 198078.96, 203435.34, 150488.28, 91630.89, 140668.06, 135022.34, 152765.45, 191950.43, 181641.86, 177531.45], "Ad Sales 2025": [72142.33, 165452.96, 133702.73, 134586.13, 135583.02, 153626.86, 142200.38, 135247.78, 128239.33, 128713.79, 136306.5, 140811.82, 155286.16, 158751.78, 168559.39], "Ad Clicks 2026": [14095.0, 27721.0, 27750.0, 27432.0, 25935.0, 21010.0, 21545.0, 15496.0, 9591.0, 14909.0, 15328.0, 16825.0, 21871.0, 21161.0, 22690.0], "Ad Clicks 2025": [14150.0, 30683.0, 22756.0, 22166.0, 23428.0, 25080.0, 22289.0, 22496.0, 18945.0, 19144.0, 17841.0, 18111.0, 19355.0, 19084.0, 21313.0]}, "months": ["Jun", "Jul", "Aug", "Sep", "Oct 1-10"], "m": {"Sales 2026": [1929815.03, null, 1543085.8, 1492855.49, 522733.7], "Units 2026": [null, null, 55626.0, 53290.0, 19485.0], "Orders 2026": [44728.0, null, 32320.0, 30549.0, 11072.0], "Sessions 2026": [274787.0, null, 189281.0, 179905.0, 62883.0], "SP Spend 2026": [342644.59, 339291.26, 214018.43, 240974.88, 87746.18], "Ad Sales 2026": [968267.8, 978096.91, 657599.33, 724683.83, 245355.12], "Sales 2025": [1575685.29, 1541006.92, 1449496.06, 1461827.92, null], "Units 2025": [null, 67008.0, 59358.0, null, null], "Orders 2025": [42471.0, 41635.0, 36376.0, 35342.0, null], "Sessions 2025": [327196.0, 303957.0, 265798.0, 236435.0, null], "SP Spend 2025": [205487.47, 179119.1, 156056.0, 144023.99, 68644.21], "Ad Sales 2025": [641411.38, 612363.39, 593825.33, 613688.36, 266528.91]}, "steps": [{"date": "2026-07-01", "label": "01 Jul", "n": 5898}, {"date": "2026-07-08", "label": "08 Jul", "n": 5807}, {"date": "2026-07-15", "label": "15 Jul", "n": 5439}, {"date": "2026-07-22", "label": "22 Jul", "n": 4942}, {"date": "2026-07-29", "label": "29 Jul", "n": 4286}, {"date": "2026-08-05", "label": "05 Aug", "n": 3995}, {"date": "2026-08-12", "label": "12 Aug", "n": 3619}]}];
+const $ = (s,el=document)=>el.querySelector(s);
+const css = n=>getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+const fmt$ = v=>v==null?'–':'$'+Math.round(v).toLocaleString('en-US');
+const fmtN = v=>v==null?'–':Math.round(v).toLocaleString('en-US');
+const fmtP = v=>v==null||!isFinite(v)?'–':(v>0?'+':'')+(v*100).toFixed(1)+'%';
+const fmtR = v=>v==null||!isFinite(v)?'–':(v*100).toFixed(1)+'%';
+const fmtA = v=>v==null||!isFinite(v)?'–':'$'+v.toFixed(2);
+const div=(a,b)=>(a==null||b==null||b===0)?null:a/b;
+const yoy=(a,b)=>{const r=div(a,b);return r==null?null:r-1};
+let cur=0, mode='weekly', charts=[];
+
+const stepPlugin={id:'steps',afterDatasetsDraw(chart,args,opts){
+  if(!opts||!opts.marks||!opts.marks.length) return;
+  const {ctx,chartArea:{top,bottom},scales:{x}}=chart; const n=chart.data.labels.length;
+  ctx.save(); ctx.strokeStyle=css('--step'); ctx.fillStyle=css('--stepInk'); ctx.lineWidth=1.5; ctx.setLineDash([4,3]);
+  ctx.font='600 11px Barlow, Arial, sans-serif'; ctx.textAlign='center';
+  opts.marks.forEach(m=>{
+    if(m.pos<0||m.pos>n-1+0.999) return;
+    const i=Math.floor(m.pos), f=m.pos-i;
+    const x0=x.getPixelForValue(i), x1=i+1<n?x.getPixelForValue(i+1):x0+(x0-x.getPixelForValue(i-1));
+    const px=x0+(x1-x0)*f;
+    ctx.beginPath(); ctx.moveTo(px,top); ctx.lineTo(px,bottom); ctx.stroke();
+    ctx.fillText(m.text,px,top-4);
+  });
+  ctx.restore();
+}};
+Chart.register(stepPlugin);
+
+function marksWeekly(g){
+  return g.steps.map(s=>{
+    const d=new Date(s.date+'T00:00:00'); let pos=-1;
+    g.weekStart.forEach((w,i)=>{const ws=new Date(w+'T00:00:00'); const diff=(d-ws)/864e5; if(diff>=0&&diff<7) pos=i+diff/7;});
+    return {pos,text:s.label.slice(0,6)};
+  });
+}
+function renderTabs(){
+  const nav=$('#cats'); nav.innerHTML='';
+  DATA.forEach((g,i)=>{
+    const b=document.createElement('button'); b.setAttribute('role','tab'); b.setAttribute('aria-selected',i===cur);
+    b.innerHTML=`<span class="plate">${g.key}</span><span>${g.name}</span>`;
+    b.onclick=()=>{cur=i;renderTabs();render();}; nav.appendChild(b);
+  });
+}
+function tot(arr){return arr.reduce((s,v)=>s+(v||0),0)}
+function render(){
+  charts.forEach(c=>c.destroy()); charts=[];
+  const g=DATA[cur], w=g.w;
+  const s26=tot(w['Sales 2026']), s25=tot(w['Sales 2025']), u26=tot(w['Units 2026']), u25=tot(w['Units 2025']), x26=tot(w['Sessions 2026']), x25=tot(w['Sessions 2025']);
+  const lastWeekEnd=new Date(g.weekStart[g.weekStart.length-1]+'T00:00:00'); lastWeekEnd.setDate(lastWeekEnd.getDate()+6);
+  const chips=g.steps.length?g.steps.map(s=>{const after=new Date(s.date+'T00:00:00')>lastWeekEnd;return `<span class="chip${after?' after':''}">${s.label} · ${s.n.toLocaleString('en-US')} ASINs${after?' (after data ends)':''}</span>`}).join(''):'<span class="lab">No price increases in this group.</span>';
+  $('#view').innerHTML=`
+   <section>
+    <div class="head"><div><h2>${g.key} — ${g.name}</h2><p>${g.desc}</p></div>
+      <div class="facts">
+        <div class="fact"><b>${g.asins.toLocaleString('en-US')}</b><span>ASINs</span></div>
+        <div class="fact"><b>${fmtP(yoy(s26,s25))}</b><span>Sales vs LY, 15 weeks</span></div>
+        <div class="fact"><b>${fmtP(yoy(u26,u25))}</b><span>Units vs LY</span></div>
+        <div class="fact"><b>${fmtP(yoy(x26,x25))}</b><span>Sessions vs LY</span></div>
+      </div></div>
+    <div class="steps"><span class="lab">Price increases:</span>${chips}</div>
+    <div class="toolbar">
+      <div class="toggle" role="group" aria-label="Period">
+        <button aria-pressed="${mode==='weekly'}" data-m="weekly">Weekly</button>
+        <button aria-pressed="${mode==='monthly'}" data-m="monthly">Monthly</button>
+      </div>
+      <div class="legend"><span><i></i>2026</span><span><i class="ly"></i>2025, same ${mode==='weekly'?'week':'month'}</span>${mode==='weekly'?'<span><i class="st"></i>Price increase date</span>':''}</div>
+    </div>
+    <div class="charts">
+      <div class="card"><div class="row"><h3>Sales</h3><span class="note">${mode==='weekly'?'Ordered product sales per week':'Average sales per day in the month'}</span></div><div class="cbox"><canvas id="c1" aria-label="Sales chart" role="img"></canvas></div></div>
+      <div class="card"><div class="row"><h3>Units</h3><span class="note">${mode==='weekly'?'Units ordered per week':'Average units per day'}</span></div><div class="cbox"><canvas id="c2" aria-label="Units chart" role="img"></canvas></div></div>
+      <div class="card"><div class="row"><h3>Sessions</h3><span class="note">${mode==='weekly'?'Sessions per week':'Average sessions per day'}</span></div><div class="cbox"><canvas id="c3" aria-label="Sessions chart" role="img"></canvas></div></div>
+    </div>
+    <div class="tablewrap">${mode==='weekly'?weeklyTable(g):monthlyTable(g)}</div>
+    <div class="foot">${notes(g)}</div>
+   </section>`;
+  $('#view').querySelectorAll('.toggle button').forEach(b=>b.onclick=()=>{mode=b.dataset.m;render();});
+  if(mode==='weekly'){
+    const mk=marksWeekly(g);
+    charts.push(lineChart('c1',g.weeks,w['Sales 2026'],w['Sales 2025'],mk,fmt$));
+    charts.push(lineChart('c2',g.weeks,w['Units 2026'],w['Units 2025'],mk,fmtN));
+    charts.push(lineChart('c3',g.weeks,w['Sessions 2026'],w['Sessions 2025'],mk,fmtN));
+  } else {
+    const days=[30,31,31,30,10], m=g.m;
+    const per=(a)=>a.map((v,i)=>v==null?null:v/days[i]);
+    const labs=g.months.map((mo,i)=>{const n=g.steps.filter(s=>monthOf(s.date)===mo).length;return n?[mo,`${n} increase${n>1?'s':''}`]:[mo,'']});
+    charts.push(barChart('c1',labs,per(m['Sales 2026']),per(m['Sales 2025']),fmt$));
+    charts.push(barChart('c2',labs,per(m['Units 2026']),per(m['Units 2025']),fmtN));
+    charts.push(barChart('c3',labs,per(m['Sessions 2026']),per(m['Sessions 2025']),fmtN));
+  }
+}
+function monthOf(d){const m=+d.slice(5,7), day=+d.slice(8,10);return m===6?'Jun':m===7?'Jul':m===8?'Aug':m===9?'Sep':(day<=10?'Oct 1-10':'later')}
+function baseOpts(fmt,marks){
+  return {responsive:true,maintainAspectRatio:false,animation:false,interaction:{mode:'index',intersect:false},
+    layout:{padding:{top:16}},
+    plugins:{legend:{display:false},steps:{marks:marks||[]},
+      tooltip:{callbacks:{label:c=>`${c.dataset.label}: ${fmt(c.parsed.y)}`}}},
+    scales:{x:{grid:{display:false},ticks:{color:css('--muted'),maxRotation:0,autoSkip:true,font:{family:'Barlow'}}},
+      y:{grid:{color:css('--grid')},border:{display:false},ticks:{color:css('--muted'),font:{family:'Barlow'},callback:v=>fmt(v)}}}};
+}
+function lineChart(id,labels,a,b,marks,fmt){
+  return new Chart($('#'+id),{type:'line',data:{labels,datasets:[
+    {label:'2026',data:a,borderColor:css('--y26'),backgroundColor:css('--y26'),borderWidth:2.5,pointRadius:2.5,tension:0},
+    {label:'2025',data:b,borderColor:css('--y25'),backgroundColor:css('--y25'),borderWidth:1.8,borderDash:[5,4],pointRadius:0,tension:0}]},
+    options:baseOpts(fmt,marks)});
+}
+function barChart(id,labels,a,b,fmt){
+  return new Chart($('#'+id),{type:'bar',data:{labels,datasets:[
+    {label:'2026',data:a,backgroundColor:css('--y26'),borderRadius:2,maxBarThickness:46},
+    {label:'2025',data:b,backgroundColor:css('--y25'),borderRadius:2,maxBarThickness:46}]},
+    options:baseOpts(fmt,[])});
+}
+function cls(v){return v==null||!isFinite(v)?'':v>0?'up':v<0?'down':''}
+function weeklyTable(g){
+  const w=g.w; let rows='';
+  const lastEnd=i=>{const d=new Date(g.weekStart[i]+'T00:00:00');return d};
+  g.weeks.forEach((lab,i)=>{
+    const ws=new Date(g.weekStart[i]+'T00:00:00'), we=new Date(ws); we.setDate(we.getDate()+6);
+    const st=g.steps.filter(s=>{const d=new Date(s.date+'T00:00:00');return d>=ws&&d<=we}).map(s=>`${s.label} (${s.n.toLocaleString('en-US')})`).join(', ');
+    rows+=row(lab,st,w,i,!!st);
+  });
+  const T={}; Object.keys(w).forEach(k=>T[k]=[tot(w[k])]);
+  rows+=row('Total','',T,0,false,true);
+  return `<table><thead><tr><th>Week starting</th><th>Price increase (ASINs)</th><th>Sales 2026</th><th>Sales 2025</th><th>Sales YoY</th><th>Units 2026</th><th>Units 2025</th><th>Units YoY</th><th>Sessions 2026</th><th>Sessions 2025</th><th>Sessions YoY</th><th>CVR 2026</th><th>CVR 2025</th><th>ASP 2026</th><th>SP spend 2026</th><th>SP spend 2025</th><th>Spend YoY</th><th>ACOS 2026</th><th>TACOS 2026</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function row(lab,st,w,i,step,total){
+  const g=k=>w[k]?w[k][i]:null;
+  const sy=yoy(g('Sales 2026'),g('Sales 2025')), uy=yoy(g('Units 2026'),g('Units 2025')), xy=yoy(g('Sessions 2026'),g('Sessions 2025')), py=yoy(g('SP Spend 2026'),g('SP Spend 2025'));
+  return `<tr class="${total?'total':''}${step?' has-step':''}"><td>${lab}</td><td>${st||''}</td><td>${fmt$(g('Sales 2026'))}</td><td>${fmt$(g('Sales 2025'))}</td><td class="${cls(sy)}">${fmtP(sy)}</td><td>${fmtN(g('Units 2026'))}</td><td>${fmtN(g('Units 2025'))}</td><td class="${cls(uy)}">${fmtP(uy)}</td><td>${fmtN(g('Sessions 2026'))}</td><td>${fmtN(g('Sessions 2025'))}</td><td class="${cls(xy)}">${fmtP(xy)}</td><td>${fmtR(div(g('Units 2026'),g('Sessions 2026')))}</td><td>${fmtR(div(g('Units 2025'),g('Sessions 2025')))}</td><td>${fmtA(div(g('Sales 2026'),g('Units 2026')))}</td><td>${fmt$(g('SP Spend 2026'))}</td><td>${fmt$(g('SP Spend 2025'))}</td><td>${fmtP(py)}</td><td>${fmtR(div(g('SP Spend 2026'),g('Ad Sales 2026')))}</td><td>${fmtR(div(g('SP Spend 2026'),g('Sales 2026')))}</td></tr>`;
+}
+function monthlyTable(g){
+  const m=g.m; let rows='';
+  g.months.forEach((mo,i)=>{
+    const st=g.steps.filter(s=>monthOf(s.date)===mo).map(s=>s.label).join(', ');
+    rows+=row(mo,st,m,i,!!st);
+  });
+  return `<table><thead><tr><th>Month</th><th>Price increases</th><th>Sales 2026</th><th>Sales 2025</th><th>Sales YoY</th><th>Units 2026</th><th>Units 2025</th><th>Units YoY</th><th>Sessions 2026</th><th>Sessions 2025</th><th>Sessions YoY</th><th>CVR 2026</th><th>CVR 2025</th><th>ASP 2026</th><th>SP spend 2026</th><th>SP spend 2025</th><th>Spend YoY</th><th>ACOS 2026</th><th>TACOS 2026</th></tr></thead><tbody>${rows}</tbody></table>`;
+}
+function notes(g){
+  const n=[];
+  if(mode==='weekly'){
+    n.push('Weeks run Sunday to Saturday. Each 2026 week is compared with the same Sunday–Saturday week of 2025 (364 days earlier).');
+    n.push('Price increases went live on Wednesdays; the dashed line sits on the actual date inside its week.');
+    n.push('Week of 05 Jul: last year\u2019s comparison week holds Prime Day 2025 (8–11 Jul). Week of 04 Oct: Prime Big Deal Days in both years.');
+  } else {
+    n.push('Oct covers 1–10 Oct only, so charts show averages per day. There is no October 2025 monthly report, so October has no comparison.');
+    n.push('June 2026 includes Prime Day (23–26 Jun); July 2025 includes Prime Day 2025 (8–11 Jul).');
+    n.push('2025 units exist only for July and August. June SP spend comes from the inventory file; July–October from the SP advertised-product reports.');
+    if(g.key==='E'||g.key==='A+B+E') n.push('July 2026 sales, units and sessions, and June 2026 units, are not available for the control ASINs, so they are left blank.');
+  }
+  n.push('CVR = units ÷ sessions. ACOS = SP spend ÷ SP ad sales. TACOS = SP spend ÷ total sales.');
+  return n.map(t=>`<p>${t}</p>`).join('');
+}
+renderTabs(); render();
+if(window.matchMedia) window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',render);
+</script>
+</body>
+</html>
